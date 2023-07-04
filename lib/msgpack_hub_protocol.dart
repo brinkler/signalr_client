@@ -27,8 +27,7 @@ class MessagePackHubProtocol implements IHubProtocol {
   @override
   List<HubMessageBase> parseMessages(Object input, Logger? logger) {
     if (!(input is Uint8List)) {
-      throw new GeneralError(
-          "Invalid input for MessagePack hub protocol. Expected an Uint8List.");
+      throw new GeneralError("Invalid input for MessagePack hub protocol. Expected an Uint8List.");
     }
 
     final binaryInput = input;
@@ -129,12 +128,8 @@ class MessagePackHubProtocol implements IHubProtocol {
 
     final MessageHeaders? headers = createMessageHeaders(data);
 
-    final message = InvocationMessage(
-        target: data[3] as String?,
-        headers: headers,
-        invocationId: data[2] as String?,
-        streamIds: [],
-        arguments: List<Object>.from(data[4]));
+    final message =
+        InvocationMessage(target: data[3] as String?, headers: headers, invocationId: data[2] as String?, streamIds: [], arguments: List<Object>.from(data[4]));
 
     return message;
   }
@@ -232,14 +227,7 @@ class MessagePackHubProtocol implements IHubProtocol {
     List<dynamic> payload;
 
     if ((message.streamIds?.length ?? 0) > 0) {
-      payload = [
-        MessageType.Invocation.index,
-        message.headers.asMap,
-        message.invocationId,
-        message.target,
-        message.arguments,
-        message.streamIds
-      ];
+      payload = [MessageType.Invocation.index, message.headers.asMap, message.invocationId, message.target, message.arguments, message.streamIds];
     } else {
       payload = [
         MessageType.Invocation.index,
@@ -258,14 +246,7 @@ class MessagePackHubProtocol implements IHubProtocol {
     List<dynamic> payload;
 
     if ((message.streamIds?.length ?? 0) > 0) {
-      payload = [
-        MessageType.StreamInvocation.index,
-        message.headers.asMap,
-        message.invocationId,
-        message.target,
-        message.arguments,
-        message.streamIds
-      ];
+      payload = [MessageType.StreamInvocation.index, message.headers.asMap, message.invocationId, message.target, message.arguments, message.streamIds];
     } else {
       payload = [
         MessageType.StreamInvocation.index,
@@ -283,12 +264,7 @@ class MessagePackHubProtocol implements IHubProtocol {
   static Uint8List _writeStreamItem(StreamItemMessage message) {
     List<dynamic> payload;
 
-    payload = [
-      MessageType.StreamItem.index,
-      message.headers.asMap,
-      message.invocationId,
-      message.item
-    ];
+    payload = [MessageType.StreamItem.index, message.headers.asMap, message.invocationId, message.item];
 
     final packedData = msgpack.serialize(payload);
     return BinaryMessageFormat.write(packedData);
@@ -302,28 +278,11 @@ class MessagePackHubProtocol implements IHubProtocol {
             ? _nonVoidResult
             : _voidResult;
     if (resultKind == _errorResult) {
-      payload = [
-        MessageType.Completion.index,
-        message.headers.asMap,
-        message.invocationId,
-        resultKind,
-        message.error
-      ];
+      payload = [MessageType.Completion.index, message.headers.asMap, message.invocationId, resultKind, message.error];
     } else if (resultKind == _nonVoidResult) {
-      payload = [
-        MessageType.Completion.index,
-        message.headers.asMap,
-        message.invocationId,
-        resultKind,
-        message.result
-      ];
+      payload = [MessageType.Completion.index, message.headers.asMap, message.invocationId, resultKind, message.result];
     } else {
-      payload = [
-        MessageType.Completion.index,
-        message.headers.asMap,
-        message.invocationId,
-        resultKind
-      ];
+      payload = [MessageType.Completion.index, message.headers.asMap, message.invocationId, resultKind];
     }
 
     final packedData = msgpack.serialize(payload);
